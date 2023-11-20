@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+    <h1>Home Page</h1>
+    <!-- Display the list of books -->
+    <ul>
+        {% for book in books %}
+            <li><a href="{{ url_for('get_book', book_id=book['id']) }}">{{ book['title'] }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

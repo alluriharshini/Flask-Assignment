@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-repeat: no-repeat;
+            background-color: #3498db; /* Set the background color to blue (#3498db) */
+            color: #fff; /* Set text color to white for better visibility on the blue background */
+        }
+
+        #chat-container {
+            width: 400px; /* Set the width of the chat container */
+            margin: 20px;
+            background: rgba(0, 0, 0, 0.7); /* Semi-transparent background for better visibility on the background image */
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #3498db; /* Set the border thickness and color for the chat container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add a subtle shadow to the chat container for depth */
+        }
+
+        #messages {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 10px; /* Add margin to create space between messages and input */
+        }
+
+        #messages li {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <input autocomplete="off" id="message_input" />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        function sendMessage() {
+            var messageInput = document.getElementById('message_input');
+            var message = messageInput.value;
+
+            if (message.trim() !== '') {
+                // Send message to server
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/send_message', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    // Clear the input field after sending the message
+                    messageInput.value = '';
+                };
+                xhr.send('content=' + encodeURIComponent(message));
+            }
+        }
+
+        function getMessages() {
+            // Get messages from the server
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/get_messages', true);
+            xhr.onload = function() {
+                var response = JSON.parse(xhr.responseText);
+                var ul = document.getElementById('messages');
+
+                // Clear existing messages
+                ul.innerHTML = '';
+
+                // Display messages
+                response.messages.forEach(function(msg) {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(msg));
+                    ul.appendChild(li);
+                });
+            };
+            xhr.send();
+        }
+
+        // Refresh messages every 1 second
+        setInterval(getMessages, 1000);
+
+        // Initial load of messages
+        getMessages();
+    </script>
+</body>
+</html>

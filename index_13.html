@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long Polling Notifications</title>
+</head>
+<body>
+    <h1>Long Polling Notifications</h1>
+    <ul id="messages"></ul>
+    <textarea id="messageInput" placeholder="Type a message"></textarea>
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        function updateMessages(messages) {
+            const messagesList = document.getElementById('messages');
+            messages.forEach(message => {
+                const li = document.createElement('li');
+                li.textContent = `${new Date(message.timestamp * 1000).toLocaleTimeString()}: ${message.content}`;
+                messagesList.appendChild(li);
+            });
+        }
+
+        async function getMessages(timestamp) {
+            const response = await fetch(`/get_messages?timestamp=${timestamp}`);
+            const data = await response.json();
+            updateMessages(data);
+            getMessages(data.length > 0 ? data[data.length - 1].timestamp : timestamp);
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const content = messageInput.value;
+            messageInput.value = '';
+
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content }),
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            getMessages(0);
+        });
+    </script>
+</body>
+</html>

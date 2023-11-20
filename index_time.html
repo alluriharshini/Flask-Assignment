@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Updates</title>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <input id="message_input" autocomplete="off">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        function sendMessage() {
+            var messageInput = document.getElementById('message_input');
+            var message = messageInput.value;
+
+            // Simulate sending the message to the server
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/send_message', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var ul = document.getElementById('messages');
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(JSON.parse(xhr.responseText).message));
+                    ul.appendChild(li);
+                }
+            };
+            xhr.send('message=' + encodeURIComponent(message));
+
+            messageInput.value = '';
+        }
+    </script>
+</body>
+</html>
